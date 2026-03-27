@@ -1,14 +1,14 @@
-import 'dotenv/config'
-import Sequelize from "sequelize";
+import 'dotenv/config';
+import SequelizePkg from "sequelize"; // Importando todo o pacote
+const { Sequelize, DataTypes } = SequelizePkg;
 
-import getUserModel from "./user";
-import getMessageModel from "./message";
+import getUserModel from "./user.js";
+import getMessageModel from "./message.js";
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
   protocol: "postgres",
   dialectOptions: {
-    // Necessary for SSL on NeonDB, Render.com and other providers
     ssl: {
       require: true,
       rejectUnauthorized: false,
@@ -18,16 +18,15 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
 });
 
 const models = {
-  User: getUserModel(sequelize, Sequelize),
-  Message: getMessageModel(sequelize, Sequelize),
+  User: getUserModel(sequelize, { DataTypes }),
+  Message: getMessageModel(sequelize, { DataTypes }),
 };
 
-Object.keys(models).forEach((key) => {
-  if ("associate" in models[key]) {
-    models[key].associate(models);
+Object.values(models).forEach((model) => {
+  if ("associate" in model) {
+    model.associate(models);
   }
 });
 
 export { sequelize };
-
 export default models;
