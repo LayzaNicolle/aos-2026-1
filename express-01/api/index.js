@@ -1,95 +1,47 @@
-import "dotenv/config";
-import cors from "cors";
-import express from "express";
-
-import models, { sequelize } from "./models/index.js";
-import routes from "./routes/index.js";
+import 'dotenv/config';
+import express from 'express';
+import cors from 'cors';
+import models, { sequelize } from './models/index.js';
+import routes from './routes/index.js';
 
 const app = express();
 
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
-app.set("trust proxy", true);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Middleware de contexto
 app.use(async (req, res, next) => {
-  req.context = {
-    models,
-    me: await models.User.findByLogin("rwieruch"),
-  };
+  req.context = { models, me: await models.User.findByLogin('rwieruch') };
   next();
 });
 
-// Log de requisições
-app.use((req, res, next) => {
-  console.log(`${req.method} ${req.path} - ${req.ip}`);
-  next();
+app.use('/session', routes.session);
+app.use('/users', routes.user);
+app.use('/messages', routes.message);
+
+app.get('/', (req, res) => {
+  res.send('Servidor rodando ' + process.env.MESSAGE);
 });
 
-// Rotas
-app.use("/session", routes.session);
-app.use("/users", routes.user);
-app.use("/messages", routes.message);
-
-// Rota principal (IMPORTANTE pro Vercel não dar 404)
-app.get("/", (req, res) => {
-  res.send(
-    "Servidor rodando 🚀\n" + process.env.MESSAGE
-  );
-});
-
-// Banco de dados
-const eraseDatabaseOnSync =
-  process.env.ERASE_DATABASE_ON_SYNC === "true";
-
-sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
-  if (eraseDatabaseOnSync) {
-    await createUsersWithMessages();
-  }
-});
-
+const eraseDatabaseOnSync = process.env.ERASE_DATABASE_ON_SYNC === 'true';
 
 const createUsersWithMessages = async () => {
   await models.User.create(
-    {
-      username: "rwieruch",
-      email: "rwieruch@email.com",
-      messages: [
-        {
-          text: "Published the Road to learn React",
-        },
-      ],
-    },
-    {
-      include: [models.Message],
-    }
+    { username: 'rwieruch', email: 'rwieruch@email.com', messages: [{ text: 'Published the Road to learn React' }] },
+    { include: [models.Message] }
   );
 
   await models.User.create(
-    {
-      username: "ddavids",
-      email: "ddavids@email.com",
-      messages: [
-        {
-          text: "Happy to release ...",
-        },
-        {
-          text: "Published a complete ...",
-        },
-      ],
-    },
-    {
-      include: [models.Message],
-    }
+    { username: 'ddavids', email: 'ddavids@email.com', messages: [{ text: 'Happy to release ...' }, { text: 'Published a complete ...' }] },
+    { include: [models.Message] }
   );
 };
+
+sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
+  if (eraseDatabaseOnSync) await createUsersWithMessages();
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT} `));
 
 export default app;
