@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Projeto Express + PostgreSQL para estudo",
   "main": "api/index.js",
+  "type": "module",
   "scripts": {
     "start": "nodemon --exec babel-node api/index.js"
   },
@@ -11,9 +12,7 @@
     "postgresql",
     "sequelize"
   ],
-  "author": "Estevão Lima",
-  "license": "MIT",
-  "type": "commonjs",
+  "author": "Layza Nicolle",
   "dependencies": {
     "@babel/core": "^7.29.0",
     "@babel/node": "^7.29.0",
