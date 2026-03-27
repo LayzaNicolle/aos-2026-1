@@ -6,10 +6,20 @@ import models, { sequelize } from "./models";
 import routes from "./routes";
 
 const app = express();
+
+
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 app.set("trust proxy", true);
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Middleware de contexto
 app.use(async (req, res, next) => {
   req.context = {
     models,
@@ -17,29 +27,35 @@ app.use(async (req, res, next) => {
   };
   next();
 });
+
+// Log de requisições
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.path} - ${req.ip}`);
   next();
 });
 
+// Rotas
 app.use("/session", routes.session);
 app.use("/users", routes.user);
 app.use("/messages", routes.message);
 
+// Rota principal (IMPORTANTE pro Vercel não dar 404)
 app.get("/", (req, res) => {
   res.send(
-    "Received a GET HTTP method\nServidor rodando!\n" + process.env.MESSAGE,
+    "Servidor rodando 🚀\n" + process.env.MESSAGE
   );
 });
 
-const port = process.env.PORT ?? 3000;
-const eraseDatabaseOnSync = process.env.ERASE_DATABASE_ON_SYNC === "true";
+// Banco de dados
+const eraseDatabaseOnSync =
+  process.env.ERASE_DATABASE_ON_SYNC === "true";
 
 sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
   if (eraseDatabaseOnSync) {
     await createUsersWithMessages();
   }
 });
+
 
 const createUsersWithMessages = async () => {
   await models.User.create(
@@ -54,7 +70,7 @@ const createUsersWithMessages = async () => {
     },
     {
       include: [models.Message],
-    },
+    }
   );
 
   await models.User.create(
@@ -72,8 +88,8 @@ const createUsersWithMessages = async () => {
     },
     {
       include: [models.Message],
-    },
+    }
   );
 };
 
-export default (req, res) => app(req, res);
+export default app;
