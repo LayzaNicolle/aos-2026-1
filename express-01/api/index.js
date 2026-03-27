@@ -37,14 +37,8 @@ const eraseDatabaseOnSync = process.env.ERASE_DATABASE_ON_SYNC === "true";
 
 sequelize.sync({ force: eraseDatabaseOnSync }).then(async () => {
   if (eraseDatabaseOnSync) {
-    createUsersWithMessages();
+    await createUsersWithMessages();
   }
-
-  app.listen(port, () =>
-    console.log(
-      "Express-01 app listening on port " + port + "!\n" + process.env.MESSAGE,
-    ),
-  );
 });
 
 const createUsersWithMessages = async () => {
