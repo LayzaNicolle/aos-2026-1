@@ -12,13 +12,13 @@ app.use(express.json());
 
 app.use('/tarefas', tarefaRoutes);
 
-app.get("/", (req, res) => {
-  res.status(200).send(
-    "Servidor rodando!"
-  );
+app.get('/', (req, res) => {
+  res.status(200).send('Servidor rodando!');
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Servidor rodando na porta ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Servidor rodando na porta ${PORT}`);
+});
 
 export default app;

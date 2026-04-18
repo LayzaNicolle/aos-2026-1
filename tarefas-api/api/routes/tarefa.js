@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import * as tarefaController from '../controllers/tarefaController.js';
+import tarefaController from '../controllers/tarefaController.js';
 
 const router = Router();
 
-router.post('/', tarefaController.criar);
-router.get('/', tarefaController.listar);
-router.get('/:objectId', tarefaController.buscarPorId);
-router.put('/:objectId', tarefaController.atualizar);
-router.delete('/:objectId', tarefaController.remover);
+router.get('/', tarefaController.listarTarefas);
+router.post('/', tarefaController.criarTarefa);
+router.get('/:id', tarefaController.buscarTarefa);
+router.put('/:id', tarefaController.atualizarTarefa);
+router.delete('/:id', tarefaController.deletarTarefa);
 
 export default router;
