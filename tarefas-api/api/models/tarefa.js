@@ -1,7 +1,10 @@
 import { Sequelize, DataTypes } from 'sequelize';
+import { createRequire } from 'module';
 import dotenv from 'dotenv';
 
 dotenv.config();
+
+const require = createRequire(import.meta.url);
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: "postgres",
@@ -16,21 +19,21 @@ const sequelize = new Sequelize(process.env.DATABASE_URL, {
 });
 
 const Tarefa = sequelize.define('Tarefa', {
-    objectId: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        primaryKey: true
-    },
-    descricao: {
-        type: DataTypes.STRING,
-        allowNull: false
-    },
-    concluida: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
-    }
+  objectId: {
+    type: DataTypes.UUID,
+    defaultValue: DataTypes.UUIDV4,
+    primaryKey: true
+  },
+  descricao: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  concluida: {
+    type: DataTypes.BOOLEAN,
+    defaultValue: false
+  }
 });
 
-sequelize.sync();
+await sequelize.sync();
 
 export default Tarefa;
